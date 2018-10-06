@@ -40,7 +40,7 @@ public class JavaMath {
 	}
 	public static String hugeIntMultiply(String factor1, String factor2) {
 		String[] addends = new String[factor2.length()];
-		int addendfactor=1;
+		StringBuilder zeroes = new StringBuilder("");
 		StringBuilder addendbuilder = new StringBuilder("");
 		int addendindex=0;
 		for(int i=factor2.length()-1;i>=0;i--) {
@@ -58,10 +58,10 @@ public class JavaMath {
 				}
 			}
 			addendbuilder.reverse();
-			addendbuilder = new StringBuilder(String.valueOf(Integer.valueOf(addendbuilder.toString())*addendfactor));
+			addendbuilder = new StringBuilder(addendbuilder.toString()+zeroes.toString());
 			addends[addendindex]=addendbuilder.toString();
-			addendfactor*=10;
 			addendindex++;
+			zeroes.append("0");
 		}
 		
 		return hugeIntsAdd(addends);
