@@ -26,13 +26,16 @@ public class JavaMath {
 		for(int i=0;i<addends.length;i++) {
 			sumbuilder = new StringBuilder(hugeIntAdd(sumbuilder.toString(),addends[i]));
 		}
+		
 		return sumbuilder.toString();
 	}
 	public static String hugeIntsMultiply(String[] factors) {
 		StringBuilder productbuilder = new StringBuilder("1");
+		
 		for(int i=0;i<factors.length;i++) {
 			productbuilder = new StringBuilder(hugeIntMultiply(productbuilder.toString(),factors[i]));
 		}
+		
 		return productbuilder.toString();
 	}
 	public static String hugeIntMultiply(String factor1, String factor2) {
@@ -60,6 +63,16 @@ public class JavaMath {
 			addendfactor*=10;
 			addendindex++;
 		}
+		
 		return hugeIntsAdd(addends);
+	}
+	public static String hugeIntExp(String base, long exponent) {
+		StringBuilder productbuilder = new StringBuilder("1");
+		
+		for(int i=0;i<exponent;i++) {
+			productbuilder = new StringBuilder(hugeIntMultiply(productbuilder.toString(),base));
+		}
+		
+		return productbuilder.toString();
 	}
 }
