@@ -1,4 +1,9 @@
 package aidan.math;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class JavaMath {
 	public static String hugeIntAdd(String addend1, String addend2) {
 		StringBuilder sumbuilder = new StringBuilder("");
@@ -74,5 +79,46 @@ public class JavaMath {
 		}
 		
 		return productbuilder.toString();
+	}
+	public static String[] hugeIntsLTG(String[] inpints){
+		List<String> intslist = new ArrayList<String>();
+		String[] ints = inpints.clone();
+		int maxlength=0;
+		for(int i=0;i<ints.length;i++){
+			if(ints[i].length()>maxlength) maxlength = ints[i].length();
+		}
+		for(int i=0;i<ints.length;i++){
+			String cur = ints[i];
+			while(cur.length()<maxlength) cur = "0"+cur;
+			intslist.add(cur);
+		}
+		Collections.sort(intslist);
+		for(int i=0;i<ints.length;i++){
+			String cur = intslist.get(i);
+			while(cur.charAt(0)=='0') cur = cur.substring(1,cur.length());
+			ints[i]=cur;
+		}
+		return ints;
+	}
+	public static String[] hugeIntsGTL(String[] inpints){
+		List<String> intslist = new ArrayList<String>();
+		String[] ints = inpints.clone();
+		int maxlength=0;
+		for(int i=0;i<ints.length;i++){
+			if(ints[i].length()>maxlength) maxlength = ints[i].length();
+		}
+		for(int i=0;i<ints.length;i++){
+			String cur = ints[i];
+			while(cur.length()<maxlength) cur = "0"+cur;
+			intslist.add(cur);
+		}
+		Collections.sort(intslist);
+		Collections.reverse(intslist);
+		for(int i=0;i<ints.length;i++){
+			String cur = intslist.get(i);
+			while(cur.charAt(0)=='0') cur = cur.substring(1,cur.length());
+			ints[i]=cur;
+		}
+		return ints;
 	}
 }
