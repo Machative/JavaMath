@@ -121,4 +121,13 @@ public class JavaMath {
 		}
 		return ints;
 	}
+	public static String hugeIntFactorial(String num){
+		String index="1";
+		String product="1";
+		while(!index.equals(hugeIntAdd(num,"1"))){
+			product = hugeIntMultiply(product,index);
+			index=hugeIntAdd(index, "1");
+		}
+		return product;
+	}
 }
