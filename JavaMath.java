@@ -2,11 +2,16 @@ package aidan.math;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class JavaMath {
-	public static String hugeIntAdd(String addend1, String addend2) {
+	public static Int hugeIntAdd(Int addend1obj, Int addend2obj) {
 		StringBuilder sumbuilder = new StringBuilder("");
+		String addend1 = addend1obj.getAbsValue();
+		String addend2 = addend2obj.getAbsValue();
+		String addend1sign = addend1obj.getSign();
+		String addend2sign = addend2obj.getSign();
 		if(addend1.length()!=addend2.length()) {
 			if(addend1.length()<addend2.length()) {
 				while(addend1.length()<addend2.length()) addend1="0"+addend1;
@@ -24,17 +29,76 @@ public class JavaMath {
 				curcarry = (presum-sum)/10;
 			}
 		}
-		return sumbuilder.reverse().toString();
+		return Int.createInt(sumbuilder.reverse().toString());
 	}
-	public static String hugeIntsAdd(String[] addends) {
+	public static Int hugeIntsAdd(Int[] addends) {
 		StringBuilder sumbuilder = new StringBuilder("0");
 		for(int i=0;i<addends.length;i++) {
-			sumbuilder = new StringBuilder(hugeIntAdd(sumbuilder.toString(),addends[i]));
+			//hugeintsadd if sign is positive, hugeintssubtract if sign is negative
+			//sumbuilder = new StringBuilder(hugeIntAdd(Int.createInt(sumbuilder.toString()),addends[i]).getValue());
 		}
 		
-		return sumbuilder.toString();
+		return Int.createInt(sumbuilder.toString());
 	}
-	public static String hugeIntsMultiply(String[] factors) {
+	public static Int hugeIntSubtract(Int minuendobj, Int subtrahendobj) {
+		String subtrahend = subtrahendobj.getAbsValue();
+		StringBuilder minuend = new StringBuilder(minuendobj.getAbsValue());
+		String minuendsign = minuendobj.getSign();
+		String subtrahendsign = subtrahendobj.getSign();
+		if(minuend.length()<subtrahend.length()) {
+			while(minuend.length()<subtrahend.length()) minuend = new StringBuilder("0" + minuend.toString());
+		}else {
+			while(subtrahend.length()<minuend.length()) subtrahend="0"+subtrahend;
+		}
+		if(minuendsign.equals("-") && subtrahendsign.equals("-")) {//Subtrahend minus the minuend (same as normal subtraction but switch min and sub)
+			String sign;
+			Int[] ltg = hugeIntsLTG(new Int[] {minuendobj,subtrahendobj});
+			if(ltg[0].equals(minuendobj)) sign="-";
+			else sign="+";
+			StringBuilder newminuend = new StringBuilder(ltg[0].getAbsValue());
+			String newsubtrahend = ltg[1].getAbsValue();
+			StringBuilder difbuilder = new StringBuilder("");
+			for(int i=newminuend.length()-1;i>=0;i--) {
+				int curmindig = Integer.valueOf(String.valueOf(newminuend.charAt(i)));
+				int cursubdig = Integer.valueOf(String.valueOf(newsubtrahend.charAt(i)));
+				if(curmindig>=cursubdig) {
+					difbuilder.append(String.valueOf(curmindig-cursubdig));
+				}else {
+					difbuilder.append(String.valueOf((curmindig+10)-cursubdig));
+					newminuend.setCharAt(i-1, Character.forDigit(Integer.valueOf(newminuend.charAt(i-1))-1,10));
+				}
+			}
+			return Int.createInt(sign,difbuilder.reverse().toString());
+		}else if(minuendsign.equals("+") && subtrahendsign.equals("-")) {//Addition with positive outcome (500+300)
+			return hugeIntAdd(Int.createInt(minuend.toString()),Int.createInt(subtrahend));
+		}else if(minuendsign.equals("-") && subtrahendsign.equals("+")) {//Addition with negative outcome ( -(500+300) )
+			return hugeIntAdd(Int.createInt(minuend.toString()).setSign("+"),Int.createInt(subtrahend).setSign("+")).setSign("-");
+		}else {//Normal subtraction (500-300)
+			String sign;
+			Int[] ltg = hugeIntsLTG(new Int[] {minuendobj,subtrahendobj});
+			if(ltg[0].equals(minuendobj)) sign="-";
+			else sign="+";
+			StringBuilder newminuend = new StringBuilder(ltg[1].getAbsValue());
+			String newsubtrahend = ltg[0].getAbsValue();
+			StringBuilder difbuilder = new StringBuilder("");
+			for(int i=newminuend.length()-1;i>=0;i--) {
+				int curmindig = Character.getNumericValue(newminuend.charAt(i));
+				int cursubdig = Character.getNumericValue(newsubtrahend.charAt(i));
+				if(curmindig>=cursubdig) {
+					difbuilder.append(String.valueOf(curmindig-cursubdig));
+				}else {
+					difbuilder.append(String.valueOf((curmindig+10)-cursubdig));
+					newminuend.setCharAt(i-1, Character.forDigit(Integer.valueOf(String.valueOf(newminuend.charAt(i-1)))-1,10));
+				}
+			}
+			String finalvalue = difbuilder.reverse().toString();
+			while(finalvalue.charAt(0)=='0' && finalvalue.length()!=1) {
+				finalvalue = finalvalue.substring(1,finalvalue.length());
+			}
+			return Int.createInt(sign,finalvalue);
+		}
+	}
+	/*public static String hugeIntsMultiply(String[] factors) {
 		StringBuilder productbuilder = new StringBuilder("1");
 		
 		for(int i=0;i<factors.length;i++) {
@@ -42,8 +106,8 @@ public class JavaMath {
 		}
 		
 		return productbuilder.toString();
-	}
-	public static String hugeIntMultiply(String factor1, String factor2) {
+	}*/
+	/*public static String hugeIntMultiply(String factor1, String factor2) {
 		String[] addends = new String[factor2.length()];
 		StringBuilder zeroes = new StringBuilder("");
 		StringBuilder addendbuilder = new StringBuilder("");
@@ -70,8 +134,8 @@ public class JavaMath {
 		}
 		
 		return hugeIntsAdd(addends);
-	}
-	public static String hugeIntExp(String base, long exponent) {
+	}*/
+	/*public static String hugeIntExp(String base, long exponent) {
 		StringBuilder productbuilder = new StringBuilder("1");
 		
 		for(int i=0;i<exponent;i++) {
@@ -79,49 +143,112 @@ public class JavaMath {
 		}
 		
 		return productbuilder.toString();
-	}
-	public static String[] hugeIntsLTG(String[] inpints){
-		List<String> intslist = new ArrayList<String>();
-		String[] ints = inpints.clone();
+	}*/
+	public static Int[] hugeIntsLTG(Int[] intsinput){
+		Int[] ints = intsinput.clone();
+		List<Int> negatives = new ArrayList<Int>();
+		List<Int> positives = new ArrayList<Int>();
 		int maxlength=0;
 		for(int i=0;i<ints.length;i++){
-			if(ints[i].length()>maxlength) maxlength = ints[i].length();
+			if(ints[i].getAbsValue().length()>maxlength) maxlength = ints[i].getAbsValue().length();
 		}
 		for(int i=0;i<ints.length;i++){
-			String cur = ints[i];
+			String cur = ints[i].getAbsValue();
 			while(cur.length()<maxlength) cur = "0"+cur;
-			intslist.add(cur);
+			if(ints[i].getSign().equals("-")) {
+				negatives.add(ints[i].setValue(cur));
+			}else {
+				positives.add(ints[i].setValue(cur));
+			}
 		}
-		Collections.sort(intslist);
-		for(int i=0;i<ints.length;i++){
-			String cur = intslist.get(i);
-			while(cur.charAt(0)=='0') cur = cur.substring(1,cur.length());
-			ints[i]=cur;
+		Comparator<Int> compareAbsValues = new Comparator<Int>() {
+			public int compare(Int int1, Int int2) {
+				return int1.getAbsValue().compareTo(int2.getAbsValue());
+			}
+		};
+		Collections.sort(positives, compareAbsValues);
+		Collections.sort(negatives, compareAbsValues);
+		Collections.reverse(negatives);
+		for(int i=0;i<negatives.size();i++){
+			String cur = negatives.get(i).getAbsValue();
+			Int curint = Int.createInt("0");
+			for(int j=0;j<intsinput.length;j++) {
+				if(negatives.get(i).equals(intsinput[j])) {
+					curint=intsinput[j];
+					break;
+				}
+			}
+			while(cur.length()>curint.getAbsValue().length()) cur = cur.substring(1,cur.length());
+			ints[i] = negatives.get(i).setValue("-",cur);
+		}
+		int offset=negatives.size();
+		for(int i=0;i<positives.size();i++){
+			String cur = positives.get(i).getAbsValue();
+			Int curint = Int.createInt("0");
+			for(int j=0;j<intsinput.length;j++) {
+				if(positives.get(i).equals(intsinput[j])) {
+					curint=intsinput[j];
+					break;
+				}
+			}
+			while(cur.length()>curint.getAbsValue().length()) cur = cur.substring(1,cur.length());
+			ints[i+offset] = positives.get(i).setValue("+",cur);
 		}
 		return ints;
 	}
-	public static String[] hugeIntsGTL(String[] inpints){
-		List<String> intslist = new ArrayList<String>();
-		String[] ints = inpints.clone();
+	public static Int[] hugeIntsGTL(Int[] intsinput){
+		Int[] ints = intsinput.clone();
+		List<Int> negatives = new ArrayList<Int>();
+		List<Int> positives = new ArrayList<Int>();
 		int maxlength=0;
 		for(int i=0;i<ints.length;i++){
-			if(ints[i].length()>maxlength) maxlength = ints[i].length();
+			if(ints[i].getAbsValue().length()>maxlength) maxlength = ints[i].getAbsValue().length();
 		}
 		for(int i=0;i<ints.length;i++){
-			String cur = ints[i];
+			String cur = ints[i].getAbsValue();
 			while(cur.length()<maxlength) cur = "0"+cur;
-			intslist.add(cur);
+			if(ints[i].getSign().equals("-")) {
+				negatives.add(ints[i].setValue(cur));
+			}else {
+				positives.add(ints[i].setValue(cur));
+			}
 		}
-		Collections.sort(intslist);
-		Collections.reverse(intslist);
-		for(int i=0;i<ints.length;i++){
-			String cur = intslist.get(i);
-			while(cur.charAt(0)=='0') cur = cur.substring(1,cur.length());
-			ints[i]=cur;
+		Comparator<Int> compareAbsValues = new Comparator<Int>() {
+			public int compare(Int int1, Int int2) {
+				return int1.getAbsValue().compareTo(int2.getAbsValue());
+			}
+		};
+		Collections.sort(positives, compareAbsValues);
+		Collections.reverse(positives);
+		Collections.sort(negatives, compareAbsValues);
+		for(int i=0;i<positives.size();i++){
+			String cur = positives.get(i).getAbsValue();
+			Int curint = Int.createInt("0");
+			for(int j=0;j<intsinput.length;j++) {
+				if(positives.get(i).equals(intsinput[j])) {
+					curint=intsinput[j];
+					break;
+				}
+			}
+			while(cur.length()>curint.getAbsValue().length()) cur = cur.substring(1,cur.length());
+			ints[i] = positives.get(i).setValue("+",cur);
+		}
+		int offset=positives.size();
+		for(int i=0;i<negatives.size();i++){
+			String cur = negatives.get(i).getAbsValue();
+			Int curint = Int.createInt("0");
+			for(int j=0;j<intsinput.length;j++) {
+				if(negatives.get(i).equals(intsinput[j])) {
+					curint=intsinput[j];
+					break;
+				}
+			}
+			while(cur.length()>curint.getAbsValue().length()) cur = cur.substring(1,cur.length());
+			ints[i+offset] = negatives.get(i).setValue("-",cur);
 		}
 		return ints;
 	}
-	public static String hugeIntFactorial(String num){
+	/*public static String hugeIntFactorial(String num){
 		String index="1";
 		String product="1";
 		while(!index.equals(hugeIntAdd(num,"1"))){
@@ -129,5 +256,5 @@ public class JavaMath {
 			index=hugeIntAdd(index, "1");
 		}
 		return product;
-	}
+	}*/
 }
