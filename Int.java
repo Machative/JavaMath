@@ -123,4 +123,13 @@ public class Int {
 		this.absValue=absValue;
 		this.value=this.sign+absValue;
 	}
+	public static Int pos_one() {
+		return new Int("+","1");
+	}
+	public static Int neg_one() {
+		return new Int("-","1");
+	}
+	public static Int zero() {
+		return new Int("0");
+	}
 }
